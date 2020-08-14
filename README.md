@@ -15,7 +15,7 @@ yarn add react-native-lightbox-v2
 `navigator` property is optional but recommended on iOS, see next section for `Navigator` configuration.
 
 ```js
-import Lightbox from 'react-native-lightbox';
+import Lightbox from 'react-native-lightbox-v2';
 
 const LightboxView ({ navigator }) => (
   <Lightbox navigator={navigator}>
