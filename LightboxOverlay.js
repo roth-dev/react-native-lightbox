@@ -151,7 +151,8 @@ const LightboxOverlay = (props) => {
       setIsAnimating(false);
     });
 
-    props.onClose();
+    // TODO delay when close
+    setTimeout(props.onClose(), 200);
   };
 
   const lightboxOpacityStyle = {
@@ -187,7 +188,7 @@ const LightboxOverlay = (props) => {
       top: openVal.current.interpolate({
         inputRange: [0, 1],
         outputRange: [
-          props.origin.y ,
+          props.origin.y,
           target.y,
         ],
       }),
