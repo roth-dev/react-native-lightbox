@@ -1,4 +1,4 @@
-import React, { Component, useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import PropTypes from "prop-types";
 import {
   Animated,
@@ -149,8 +149,9 @@ const LightboxOverlay = (props) => {
       useNativeDriver: false,
     }).start(() => {
       setIsAnimating(false);
-      props.onClose();
     });
+
+    props.onClose();
   };
 
   const lightboxOpacityStyle = {
