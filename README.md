@@ -1,6 +1,8 @@
-# react-native-lightbox
+# react-native-lightbox-v2
 
 *Fork this project to do some updates, because the original library seems to be out of maintenance！*
+
+*Thanks Joel Arvidsson*
 
 ## Installation
 
