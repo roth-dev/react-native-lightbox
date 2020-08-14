@@ -65,6 +65,7 @@ const MyApp = () => (
 |**`onClose`**|`function`|Triggered when lightbox is closed|
 |**`onOpen`**|`function`|Triggered when lightbox is opened|
 |**`didOpen`**|`function`|Triggered after lightbox is opened|
+|**`onLongPress`**|`function`|Triggered after lightbox is long pressed|
 |**`underlayColor`**|`string`|Color of touchable background, defaults to `black`|
 |**`backgroundColor`**|`string`|Color of lightbox background, defaults to `black`|
 |**`swipeToDismiss`**|`bool`|Enables gestures to dismiss the fullscreen mode by swiping up or down, defaults to `true`.|
