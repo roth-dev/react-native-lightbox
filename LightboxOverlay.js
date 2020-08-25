@@ -152,7 +152,7 @@ const LightboxOverlay = (props) => {
     });
 
     // TODO delay when close
-    setTimeout(props.onClose(), 200);
+    setTimeout(props.onClose, 200);
   };
 
   const lightboxOpacityStyle = {
