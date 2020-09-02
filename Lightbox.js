@@ -91,6 +91,8 @@ const Lightbox = (props) => {
       routes.pop();
       props.navigator.immediatelyResetRouteStack(routes);
     }
+
+    props.onClose && props.onClose();
   };
 
   return (
