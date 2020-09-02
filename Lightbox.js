@@ -94,7 +94,7 @@ const Lightbox = (props) => {
   };
 
   return (
-    <View ref={_root} style={props.style} onLayout={() => {}}>
+    <View ref={_root} style={props.style} onLayout={props.onLayout}>
       <Animated.View style={{ opacity: layoutOpacity.current }}>
         <TouchableOpacity
           underlayColor={props.underlayColor}
@@ -119,6 +119,8 @@ Lightbox.propTypes = {
   onOpen: PropTypes.func,
   willClose: PropTypes.func,
   onClose: PropTypes.func,
+  onLongPress: PropTypes.func,
+  onLayout: PropTypes.func,
   springConfig: PropTypes.shape({
     tension: PropTypes.number,
     friction: PropTypes.number,
@@ -132,7 +134,8 @@ Lightbox.defaultProps = {
   didOpen: () => {},
   willClose: () => {},
   onClose: () => {},
-  onLongPress: () => {},
+  onLongPress: null, // in andriod mobile, e.g HuaWei Nova5 Plus+, onPress will not work well
+  onLayout: () => {}
 };
 
 export default Lightbox;
