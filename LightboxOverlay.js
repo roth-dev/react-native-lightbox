@@ -82,7 +82,7 @@ const LightboxOverlay = (props) => {
         setIsPanning(true);
       },
       onPanResponderMove: Animated.event([null, { dy: pan.current }], {
-        useNativeDriver: false,
+        useNativeDriver: props.useNativeDriver,
       }),
       onPanResponderTerminationRequest: (evt, gestureState) => true,
       onPanResponderRelease: (evt, gestureState) => {
@@ -99,12 +99,12 @@ const LightboxOverlay = (props) => {
           Animated.spring(pan.current, {
             toValue: 0,
             ...props.springConfig,
-            useNativeDriver: false,
+            useNativeDriver: props.useNativeDriver,
           }).start(() => setIsPanning(false));
         }
       },
     });
-  }, []);
+  }, [props.useNativeDriver]);
 
   useEffect(() => {
     if (props.isOpen) {
@@ -129,7 +129,7 @@ const LightboxOverlay = (props) => {
     Animated.spring(openVal.current, {
       toValue: 1,
       ...props.springConfig,
-      useNativeDriver: false,
+      useNativeDriver: props.useNativeDriver,
     }).start(() => {
       setIsAnimating(false);
       props.didOpen();
@@ -146,7 +146,7 @@ const LightboxOverlay = (props) => {
     Animated.spring(openVal.current, {
       toValue: 0,
       ...props.springConfig,
-      useNativeDriver: false,
+      useNativeDriver: props.useNativeDriver,
     }).start(() => {
       setIsAnimating(false);
     });
@@ -270,11 +270,13 @@ LightboxOverlay.propTypes = {
   onClose: PropTypes.func,
   willClose: PropTypes.func,
   swipeToDismiss: PropTypes.bool,
+  useNativeDriver: PropTypes.bool
 };
 
 LightboxOverlay.defaultProps = {
   springConfig: { tension: 30, friction: 7 },
   backgroundColor: "black",
+  useNativeDriver: false
 };
 
 export default LightboxOverlay;
