@@ -40,6 +40,7 @@ const Lightbox = (props) => {
     didOpen: props.didOpen,
     willClose: props.willClose,
     onClose: onClose,
+    useNativeDriver: props.useNativeDriver
   });
 
   open = () => {
@@ -128,6 +129,7 @@ Lightbox.propTypes = {
     friction: PropTypes.number,
   }),
   swipeToDismiss: PropTypes.bool,
+  useNativeDriver: PropTypes.bool
 };
 
 Lightbox.defaultProps = {
@@ -137,7 +139,8 @@ Lightbox.defaultProps = {
   willClose: () => {},
   onClose: () => {},
   onLongPress: null, // in andriod mobile, e.g HuaWei Nova5 Plus+, onPress will not work well
-  onLayout: () => {}
+  onLayout: () => {},
+  useNativeDriver: false
 };
 
 export default Lightbox;

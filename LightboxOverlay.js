@@ -13,8 +13,7 @@ import {
   View,
 } from "react-native";
 
-const WINDOW_HEIGHT = Dimensions.get("window").height;
-const WINDOW_WIDTH = Dimensions.get("window").width;
+const { width: WINDOW_WIDTH, height: WINDOW_HEIGHT } = Dimensions.get("window");
 const DRAG_DISMISS_THRESHOLD = 150;
 const isIOS = Platform.OS === "ios";
 

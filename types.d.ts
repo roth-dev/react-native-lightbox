@@ -15,6 +15,7 @@ declare module 'react-native-lightbox-v2' {
     swipeToDismiss?: boolean
     style?: StyleProp<ViewStyle>
     onLongPress?: (...args: any) => void
+    useNativeDriver?: boolean
   }
 
   const Lightbox: React.FC<LightboxProps>
