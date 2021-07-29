@@ -1,11 +1,18 @@
 {
   "name": "react-native-lightbox-v2",
-  "version": "0.8.8",
+  "version": "0.8.9",
   "description": "Images etc in Full Screen Lightbox Popovers for React Native",
-  "main": "Lightbox.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
-    "test": "flow check"
+    "build": "tsc",
+    "prepublish": "yarn build"
   },
+  "files": [
+    "dist",
+    "readme.md",
+    "package.json"
+  ],
   "keywords": [
     "react-native",
     "react-component",
@@ -17,7 +24,9 @@
     "ui",
     "lightbox",
     "gallery",
-    "image"
+    "image-gallery",
+    "image",
+    "image-viewer"
   ],
   "repository": {
     "type": "git",
@@ -29,8 +38,13 @@
     "url": "https://github.com/cbbfcd/react-native-lightbox/issues"
   },
   "homepage": "https://github.com/cbbfcd/react-native-lightbox",
-  "dependencies": {
-    "prop-types": "^15.7.2"
+  "devDependencies": {
+    "@babel/runtime": "7.7.4",
+    "@types/react": "16.9.13",
+    "@types/react-native": "0.60.23",
+    "react": "16.12.0",
+    "react-native": "0.61.5",
+    "typescript": "3.7.2"
   },
   "peerDependencies": {
     "react": ">=16.8.0",

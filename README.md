@@ -79,6 +79,10 @@ const MyApp = () => (
 
 Check full example in the `Example` folder.
 
+## Changelog
+
+[Changelog](./CHANGELOG.md)
+
 ## License
 
 [MIT License](http://opensource.org/licenses/mit-license.html). © Joel Arvidsson

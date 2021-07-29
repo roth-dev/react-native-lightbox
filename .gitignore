@@ -24,3 +24,12 @@ build/Release
 node_modules
 
 .gradle
+
+# extra
+dist/
+.DS_STORE
+
+# yarn
+*.lock
+*-error.json
+
