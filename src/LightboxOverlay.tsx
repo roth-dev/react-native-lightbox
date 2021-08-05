@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import {
   Animated,
   Dimensions,
@@ -10,8 +10,8 @@ import {
   TouchableOpacity,
   Text,
   Modal,
+  GestureResponderHandlers,
 } from "react-native";
-import { useAsyncSetState } from "./use-async-state";
 
 import { LightboxProps, IOrigin, ISpringConfig } from "./Lightbox";
 
@@ -86,20 +86,21 @@ const LightboxOverlay: React.FC<LightboxOverlayProps> = ({
   const _panResponder = useRef<PanResponderInstance>();
   const pan = useRef(new Animated.Value(0));
   const openVal = useRef(new Animated.Value(0));
+  const handlers = useRef<GestureResponderHandlers>();
 
-  const [{ isAnimating, isPanning, target }, setStateAsync] = useAsyncSetState({
+  const [{ isAnimating, isPanning, target }, setState] = useState({
     isAnimating: false,
     isPanning: false,
     target: getDefaultTarget(),
   });
 
-  const close = async () => {
+  const close = () => {
     willClose!();
     if (isIOS) {
       StatusBar.setHidden(false, "fade");
     }
 
-    await setStateAsync((s) => ({
+    setState((s) => ({
       ...s,
       isAnimating: true,
     }));
@@ -109,21 +110,19 @@ const LightboxOverlay: React.FC<LightboxOverlayProps> = ({
       ...springConfig,
       useNativeDriver,
     }).start(() => {
-      (async () => {
-        await setStateAsync((s) => ({ ...s, isAnimating: false }));
-        onClose!();
-      })();
+      setState((s) => ({ ...s, isAnimating: false }));
+      onClose!();
     });
   };
 
-  const open = async () => {
+  const open = () => {
     if (isIOS) {
       StatusBar.setHidden(true, "fade");
     }
 
     pan.current.setValue(0);
 
-    await setStateAsync((s) => ({
+    setState((s) => ({
       ...s,
       isAnimating: true,
       target: getDefaultTarget(),
@@ -134,14 +133,12 @@ const LightboxOverlay: React.FC<LightboxOverlayProps> = ({
       ...springConfig,
       useNativeDriver,
     }).start(() => {
-      (async () => {
-        await setStateAsync((s) => ({ ...s, isAnimating: false }));
-        didOpen!();
-      })();
+      setState((s) => ({ ...s, isAnimating: false }));
+      didOpen!();
     });
   };
 
-  const initPanResponder = async () => {
+  const initPanResponder = () => {
     _panResponder.current = PanResponder.create({
       // Ask to be the responder:
       onStartShouldSetPanResponder: () => !isAnimating,
@@ -151,9 +148,7 @@ const LightboxOverlay: React.FC<LightboxOverlayProps> = ({
 
       onPanResponderGrant: () => {
         pan.current.setValue(0);
-        (async () => {
-          await setStateAsync((s) => ({ ...s, isPanning: true }));
-        })();
+        setState((s) => ({ ...s, isPanning: true }));
       },
 
       onPanResponderMove: Animated.event([null, { dy: pan.current }], {
@@ -162,27 +157,23 @@ const LightboxOverlay: React.FC<LightboxOverlayProps> = ({
       onPanResponderTerminationRequest: () => true,
       onPanResponderRelease: (evt, gestureState) => {
         if (Math.abs(gestureState.dy) > dragDismissThreshold!) {
-          (async () => {
-            await setStateAsync((s) => ({
-              ...s,
-              isPanning: false,
-              target: {
-                y: gestureState.dy,
-                x: gestureState.dx,
-                opacity: 1 - Math.abs(gestureState.dy / WINDOW_HEIGHT),
-              },
-            }));
-            close();
-          })();
+          setState((s) => ({
+            ...s,
+            isPanning: false,
+            target: {
+              y: gestureState.dy,
+              x: gestureState.dx,
+              opacity: 1 - Math.abs(gestureState.dy / WINDOW_HEIGHT),
+            },
+          }));
+          close();
         } else {
           Animated.spring(pan.current, {
             toValue: 0,
             ...springConfig,
             useNativeDriver,
           }).start(() => {
-            (async () => {
-              await setStateAsync((s) => ({ ...s, isPanning: false }));
-            })();
+            setState((s) => ({ ...s, isPanning: false }));
           });
         }
       },
@@ -191,11 +182,17 @@ const LightboxOverlay: React.FC<LightboxOverlayProps> = ({
 
   useEffect(() => {
     initPanResponder();
-  }, [useNativeDriver]);
+  }, [useNativeDriver, isAnimating]);
 
   useEffect(() => {
     isOpen && open();
   }, [isOpen]);
+
+  useEffect(() => {
+    if (_panResponder.current && swipeToDismiss) {
+      handlers.current = _panResponder.current.panHandlers;
+    }
+  }, [swipeToDismiss, _panResponder.current]);
 
   const lightboxOpacityStyle = {
     opacity: openVal.current.interpolate({
@@ -203,11 +200,6 @@ const LightboxOverlay: React.FC<LightboxOverlayProps> = ({
       outputRange: [0, target.opacity],
     }),
   };
-
-  let handlers;
-  if (swipeToDismiss && _panResponder.current) {
-    handlers = _panResponder.current.panHandlers;
-  }
 
   let dragStyle;
   if (isPanning) {
@@ -220,7 +212,7 @@ const LightboxOverlay: React.FC<LightboxOverlayProps> = ({
     });
   }
 
-  const getOpenStyle = () => [
+  const openStyle = [
     styles.open,
     {
       left: openVal.current.interpolate({
@@ -261,7 +253,7 @@ const LightboxOverlay: React.FC<LightboxOverlayProps> = ({
   );
 
   const content = (
-    <Animated.View style={[getOpenStyle(), dragStyle]} {...handlers}>
+    <Animated.View style={[openStyle, dragStyle]} {...handlers.current}>
       {children}
     </Animated.View>
   );

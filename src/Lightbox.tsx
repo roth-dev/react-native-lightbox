@@ -1,9 +1,9 @@
 import React, {
   useRef,
+  useState,
   cloneElement,
   Children,
   isValidElement,
-  useEffect,
 } from "react";
 import {
   StyleProp,
@@ -15,24 +15,21 @@ import {
 } from "react-native";
 
 import LightboxOverlay from "./LightboxOverlay";
-import { useAsyncSetState } from "./use-async-state";
+import { useNextTick } from "./use-next-tick";
 
 const noop = () => {};
 
 export type Func<T, R> = (...args: T[]) => R;
-
 export interface IOrigin {
   width: number;
   height: number;
   x: number;
   y: number;
 }
-
 export interface ISpringConfig {
   tension: number;
   friction: number;
 }
-
 export interface LightboxProps<T = any> {
   activeProps?: Record<string, T>;
   renderContent?: Func<T, JSX.Element>;
@@ -72,7 +69,7 @@ const Lightbox: React.FC<LightboxProps> = ({
   onLongPress = noop,
   onLayout = noop,
   springConfig = { tension: 30, friction: 7 },
-  backgroundColor = "blank",
+  backgroundColor = "black",
   underlayColor,
   style,
   dragDismissThreshold = 150,
@@ -81,9 +78,13 @@ const Lightbox: React.FC<LightboxProps> = ({
 }) => {
   const layoutOpacity = useRef(new Animated.Value(1));
   const _root = useRef<View>(null);
-  const timer = useRef<number | null>(null);
 
-  const [{ isOpen, origin }, setStateAsync] = useAsyncSetState({
+  const closeNextTick = useNextTick(onClose);
+  const openNextTick = useNextTick(() => {
+    _root.current && layoutOpacity.current.setValue(0);
+  });
+
+  const [{ isOpen, origin }, setState] = useState({
     isOpen: false,
     origin: { x: 0, y: 0, width: 0, height: 0 },
   });
@@ -96,45 +97,33 @@ const Lightbox: React.FC<LightboxProps> = ({
     return children;
   };
 
-  const handleOnClose = async () => {
+  const handleOnClose = () => {
     layoutOpacity.current.setValue(1);
-    await setStateAsync((s) => ({ ...s, isOpen: false }));
-    onClose();
+    setState((s) => ({ ...s, isOpen: false }));
+    closeNextTick();
   };
 
-  const wrapMeasureWithPromise = (): Promise<IOrigin> =>
-    new Promise((resolve) => {
-      _root.current!.measure((ox, oy, width, height, px, py) => {
-        resolve({ width, height, x: px, y: py });
-      });
+  const wrapMeasureWithCallback = (callback: Func<any, void>) => {
+    _root.current!.measure((ox, oy, width, height, px, py) => {
+      callback({ width, height, x: px, y: py });
     });
+  };
 
-  const open = async () => {
+  const open = () => {
     if (!_root.current) return;
 
     onOpen();
 
-    const newOrigin = await wrapMeasureWithPromise();
-    await setStateAsync((s) => ({
-      ...s,
-      isOpen: true,
-      origin: { ...newOrigin },
-    }));
+    wrapMeasureWithCallback((newOrigin) => {
+      setState((s) => ({
+        ...s,
+        isOpen: true,
+        origin: { ...newOrigin },
+      }));
 
-    timer.current = setTimeout(() => {
-      _root.current && layoutOpacity.current.setValue(0);
+      openNextTick();
     });
   };
-
-  // will unmount
-  useEffect(() => {
-    return () => {
-      if (timer.current) {
-        clearTimeout(timer.current);
-        timer.current = null;
-      }
-    };
-  }, []);
 
   const getOverlayProps = () => ({
     isOpen,

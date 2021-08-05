@@ -28,7 +28,6 @@ const renderCarousel = () => (
     <View style={{ backgroundColor: '#E67E22', flex: 1 }}/>
   </Carousel>
 )
-
 export default () => (
     <SafeAreaView>
       <ScrollView style={styles.container}>

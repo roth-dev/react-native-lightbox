@@ -14,6 +14,8 @@ yarn add react-native-lightbox-v2
 
 ## Usage
 
+> Note: react-native-lightbox-v2 will no longer support navigator after version 0.8.9.
+
 `navigator` property is optional but recommended on iOS, see next section for `Navigator` configuration.
 
 ```js
@@ -30,6 +32,8 @@ const LightboxView = ({ navigator }) => (
 ```
 
 ### Navigator setup/Android support
+
+> Note: react-native-lightbox-v2 will no longer support navigator after version 0.8.9.
 
 For android support you must pass a reference to a `Navigator` since it does not yet have the `Modal` component and is not on the official todo list. See the `Example` project for a complete example.
 
@@ -66,9 +70,15 @@ const MyApp = () => (
 |**`onOpen`**|`function`|Triggered when lightbox is opened|
 |**`didOpen`**|`function`|Triggered after lightbox is opened|
 |**`onLongPress`**|`function`|Triggered after lightbox is long pressed|
+|**`onLayout`**|`function`|Triggered after lightbox layout complete|
 |**`underlayColor`**|`string`|Color of touchable background, defaults to `black`|
 |**`backgroundColor`**|`string`|Color of lightbox background, defaults to `black`|
 |**`swipeToDismiss`**|`bool`|Enables gestures to dismiss the fullscreen mode by swiping up or down, defaults to `true`.|
+|**`disabled`**|`bool`|disable the lightbox. defaults to `false`.|
+|**`style`**|`object`|lightbox view wrapper's style.|
+|**`dragDismissThreshold`**|`number`|threshold distance for sliding exit. defaults to `150`.|
+|**`modalProps`**|`object`|any other modal props you need. defaults to `{}`.|
+|**`useNativeDriver`**|`bool`|wether use native driver. defaults to `false`.|
 |**`springConfig`**|`object`|[`Animated.spring`](https://facebook.github.io/react-native/docs/animations.html) configuration, defaults to `{ tension: 30, friction: 7 }`.|
 
 ## Demo

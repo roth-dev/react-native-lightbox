@@ -19,7 +19,7 @@
     "e2e:test": "detox test --configuration ios.sim.debug"
   },
   "dependencies": {
-    "react-native-lightbox": "file:../",
+    "react-native-lightbox": "file:..",
     "react-native-looped-carousel": "^0.1.7",
     "@react-native-community/cli": "^4.10.1",
     "@react-native-community/masked-view": "^0.1.9",
@@ -59,7 +59,7 @@
     "victory-native": "^31.0.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.5.0",
+    "@babel/core": "^7.12.9",
     "@babel/preset-flow": "^7.0.0",
     "@babel/runtime": "^7.5.0",
     "@react-native-community/eslint-config": "^0.0.3",
