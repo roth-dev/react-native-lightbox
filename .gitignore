@@ -26,7 +26,6 @@ node_modules
 .gradle
 
 # extra
-dist/
 .DS_STORE
 
 # yarn
