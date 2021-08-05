@@ -4,6 +4,7 @@
   "description": "Images etc in Full Screen Lightbox Popovers for React Native",
   "main": "dist/Lightbox.js",
   "types": "dist/Lightbox.d.ts",
+  "module": "dist/Lightbox.js",
   "scripts": {
     "build": "rm -rf dist && tsc",
     "prepublish": "yarn build"
