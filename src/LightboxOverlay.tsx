@@ -115,7 +115,7 @@ const LightboxOverlay: React.FC<LightboxOverlayProps> = ({
     }).start(() => {
       setState((s) => ({ ...s, isAnimating: false }));
     });
-    handleCloseNextTick;
+    handleCloseNextTick();
   };
 
   const open = () => {
