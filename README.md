@@ -1,14 +1,13 @@
 # react-native-lightbox-v2
 
-*Fork this project to do some updates, because the original library seems to be out of maintenance！*
-
-*Thanks Joel Arvidsson*
+> *Fork this project to do some updates, because the original library seems to be out of maintenance！*
+> *Thanks Joel Arvidsson*
 
 ## Installation
 
 *I changed the name in order to publish to npm, it is not actually a new version, it just fixed some problems based on the original！*
 
-```
+```shell
 yarn add react-native-lightbox-v2
 ```
 
