@@ -14,6 +14,7 @@ import {
 } from "react-native";
 
 import { LightboxProps, IOrigin, ISpringConfig } from "./Lightbox";
+import { useNextTick } from "./use-next-tick";
 
 type OmitedLightboxProps = Omit<
   LightboxProps,
@@ -94,6 +95,8 @@ const LightboxOverlay: React.FC<LightboxOverlayProps> = ({
     target: getDefaultTarget(),
   });
 
+  const handleCloseNextTick = useNextTick(onClose!);
+
   const close = () => {
     willClose!();
     if (isIOS) {
@@ -111,8 +114,8 @@ const LightboxOverlay: React.FC<LightboxOverlayProps> = ({
       useNativeDriver,
     }).start(() => {
       setState((s) => ({ ...s, isAnimating: false }));
-      onClose!();
     });
+    handleCloseNextTick;
   };
 
   const open = () => {
