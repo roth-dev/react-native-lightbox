@@ -10,12 +10,11 @@ import {
   SafeAreaView
 } from 'react-native';
 
-import Lightbox from 'react-native-lightbox';
+import Lightbox from './dist/Lightbox.js';
 import Carousel from 'react-native-looped-carousel';
 
 const WINDOW_WIDTH = Dimensions.get('window').width;
 const BASE_PADDING = 10;
-
 const renderCarousel = () => (
   <Carousel style={{ width: WINDOW_WIDTH, height: WINDOW_WIDTH }}>
     <Image

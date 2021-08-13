@@ -16,6 +16,7 @@ import {
 
 import LightboxOverlay from "./LightboxOverlay";
 import { useNextTick } from "./use-next-tick";
+import { DoubleTapOptions } from "./use-double-tap";
 
 const noop = () => {};
 
@@ -30,16 +31,14 @@ export interface ISpringConfig {
   tension: number;
   friction: number;
 }
-export interface LightboxProps<T = any> {
+export interface LightboxProps<T = any> extends DoubleTapOptions {
   activeProps?: Record<string, T>;
   renderContent?: Func<T, JSX.Element>;
   renderHeader?: Func<T, JSX.Element>;
   didOpen?: Func<T, void>;
   onOpen?: Func<T, void>;
-  // willOpen?: Func<T, void>;
   willClose?: Func<T, void>;
   onClose?: Func<T, void>;
-  // didClose?: Func<T, void>;
   onLongPress?: Func<T, void>;
   onLayout?: Func<T, void>;
   swipeToDismiss?: boolean;
@@ -60,12 +59,10 @@ const Lightbox: React.FC<LightboxProps> = ({
   disabled = false,
   renderContent,
   renderHeader,
-  // willOpen = noop,
   didOpen = noop,
   onOpen = noop,
   willClose = noop,
   onClose = noop,
-  // didClose = noop,
   onLongPress = noop,
   onLayout = noop,
   springConfig = { tension: 30, friction: 7 },
@@ -75,6 +72,7 @@ const Lightbox: React.FC<LightboxProps> = ({
   dragDismissThreshold = 150,
   children,
   modalProps = {},
+  ...rest
 }) => {
   const layoutOpacity = useRef(new Animated.Value(1));
   const _root = useRef<View>(null);
@@ -139,6 +137,7 @@ const Lightbox: React.FC<LightboxProps> = ({
     useNativeDriver,
     dragDismissThreshold,
     modalProps,
+    ...rest,
   });
 
   return (

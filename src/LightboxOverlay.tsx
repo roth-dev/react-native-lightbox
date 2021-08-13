@@ -14,7 +14,7 @@ import {
 } from "react-native";
 
 import { LightboxProps, IOrigin, ISpringConfig } from "./Lightbox";
-import { useDoubleTap, AnimatedTransformStyle } from "./use-double-tap";
+import { useDoubleTap, AnimatedTransformStyle, DoubleTapOptions } from "./use-double-tap";
 import { useNextTick } from "./use-next-tick";
 
 type OmitedLightboxProps = Omit<
@@ -22,7 +22,7 @@ type OmitedLightboxProps = Omit<
   "style" | "disabled" | "underlayColor" | "activeProps" | "renderContent"
 >;
 
-export interface LightboxOverlayProps extends OmitedLightboxProps {
+export interface LightboxOverlayProps extends OmitedLightboxProps, DoubleTapOptions {
   isOpen?: boolean;
   origin?: IOrigin;
   springConfig?: ISpringConfig;
@@ -84,6 +84,14 @@ const LightboxOverlay: React.FC<LightboxOverlayProps> = ({
   renderHeader,
   modalProps,
   children,
+  doubleTapEnabled,
+  doubleTapGapTimer,
+  doubleTapCallback,
+  doubleTapZoomToCenter,
+  doubleTapMaxZoom,
+  doubleTapZoomStep,
+  doubleTapInitialScale,
+  doubleTapAnimationDuration,
 }) => {
   const _panResponder = useRef<PanResponderInstance>();
   const pan = useRef(new Animated.Value(0));
@@ -91,7 +99,17 @@ const LightboxOverlay: React.FC<LightboxOverlayProps> = ({
   const handlers = useRef<GestureResponderHandlers>();
   const animatedTransformStyle = useRef<AnimatedTransformStyle>();
 
-  const handleDoubleTap = useDoubleTap({ useNativeDriver });
+  const handleDoubleTap = useDoubleTap({
+    useNativeDriver,
+    doubleTapEnabled,
+    doubleTapGapTimer,
+    doubleTapCallback,
+    doubleTapZoomToCenter,
+    doubleTapMaxZoom,
+    doubleTapZoomStep,
+    doubleTapInitialScale,
+    doubleTapAnimationDuration,
+  });
 
   const [{ isAnimating, isPanning, target }, setState] = useState({
     isAnimating: false,

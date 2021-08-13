@@ -1,4 +1,5 @@
 {
   "name": "ReactNativeStarter",
-  "displayName": "ReactNativeStarter"
+  "displayName": "ReactNativeStarter",
+  "entryPoint": "./index.js"
 }

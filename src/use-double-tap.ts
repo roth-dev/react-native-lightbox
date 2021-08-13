@@ -4,6 +4,7 @@ import { GestureResponderEvent, PanResponderGestureState, Dimensions, Animated }
 const now = () => +new Date();
 const { width, height } = Dimensions.get('window');
 const INIT_POSITION = { x: 0, y: 0 };
+
 interface IDoubleTapOptions {
   doubleTapEnabled?: boolean;
   doubleTapGapTimer?: number;
@@ -63,6 +64,13 @@ export const useDoubleTap = ({
     scale.current = nextScaleStep;
   };
 
+  // todo how to reset?
+  const reset = () => {
+    animatedScale.current.setValue(doubleTapInitialScale);
+    animatedPositionX.current.setValue(INIT_POSITION.x);
+    animatedPositionY.current.setValue(INIT_POSITION.y);
+  }
+
   const handleDoubleTap = (e: GestureResponderEvent, gestureState: PanResponderGestureState, ref: React.MutableRefObject<AnimatedTransformStyle | undefined>) => {
     if (doubleTapCallback) doubleTapCallback(e, gestureState);
 
@@ -93,11 +101,7 @@ export const useDoubleTap = ({
         duration: doubleTapAnimationDuration,
         useNativeDriver,
       }),
-    ]).start(({ finished }) => {
-      if (finished) {
-        doubleTaped.current = false;
-      }
-    });
+    ]).start();
 
     // todo it's not better enough.
     if (ref) {
