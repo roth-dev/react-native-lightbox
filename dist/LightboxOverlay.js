@@ -1,5 +1,7 @@
 import React, { useRef, useEffect, useState } from "react";
 import { Animated, Dimensions, PanResponder, Platform, StyleSheet, StatusBar, TouchableOpacity, Text, Modal, } from "react-native";
+import { useDoubleTap } from "./use-double-tap";
+import { useNextTick } from "./use-next-tick";
 const { width: WINDOW_WIDTH, height: WINDOW_HEIGHT } = Dimensions.get("window");
 const isIOS = Platform.OS === "ios";
 const getDefaultTarget = () => ({ x: 0, y: 0, opacity: 1 });
@@ -45,11 +47,14 @@ const LightboxOverlay = ({ useNativeDriver, dragDismissThreshold, springConfig, 
     const pan = useRef(new Animated.Value(0));
     const openVal = useRef(new Animated.Value(0));
     const handlers = useRef();
+    const animatedTransformStyle = useRef();
+    const handleDoubleTap = useDoubleTap({ useNativeDriver });
     const [{ isAnimating, isPanning, target }, setState] = useState({
         isAnimating: false,
         isPanning: false,
         target: getDefaultTarget(),
     });
+    const handleCloseNextTick = useNextTick(onClose);
     const close = () => {
         willClose();
         if (isIOS) {
@@ -63,9 +68,11 @@ const LightboxOverlay = ({ useNativeDriver, dragDismissThreshold, springConfig, 
             toValue: 0,
             ...springConfig,
             useNativeDriver,
-        }).start(() => {
-            setState((s) => ({ ...s, isAnimating: false }));
-            onClose();
+        }).start(({ finished }) => {
+            if (finished) {
+                setState((s) => ({ ...s, isAnimating: false }));
+                handleCloseNextTick();
+            }
         });
     };
     const open = () => {
@@ -82,9 +89,11 @@ const LightboxOverlay = ({ useNativeDriver, dragDismissThreshold, springConfig, 
             toValue: 1,
             ...springConfig,
             useNativeDriver,
-        }).start(() => {
-            setState((s) => ({ ...s, isAnimating: false }));
-            didOpen();
+        }).start(({ finished }) => {
+            if (finished) {
+                setState((s) => ({ ...s, isAnimating: false }));
+                didOpen();
+            }
         });
     };
     const initPanResponder = () => {
@@ -94,9 +103,11 @@ const LightboxOverlay = ({ useNativeDriver, dragDismissThreshold, springConfig, 
             onStartShouldSetPanResponderCapture: () => !isAnimating,
             onMoveShouldSetPanResponder: () => !isAnimating,
             onMoveShouldSetPanResponderCapture: () => !isAnimating,
-            onPanResponderGrant: () => {
+            onPanResponderGrant: (e, gestureState) => {
                 pan.current.setValue(0);
                 setState((s) => ({ ...s, isPanning: true }));
+                // handle double tap
+                handleDoubleTap(e, gestureState, animatedTransformStyle);
             },
             onPanResponderMove: Animated.event([null, { dy: pan.current }], {
                 useNativeDriver,
@@ -120,8 +131,8 @@ const LightboxOverlay = ({ useNativeDriver, dragDismissThreshold, springConfig, 
                         toValue: 0,
                         ...springConfig,
                         useNativeDriver,
-                    }).start(() => {
-                        setState((s) => ({ ...s, isPanning: false }));
+                    }).start(({ finished }) => {
+                        finished && setState((s) => ({ ...s, isPanning: false }));
                     });
                 }
             },
@@ -181,7 +192,7 @@ const LightboxOverlay = ({ useNativeDriver, dragDismissThreshold, springConfig, 
           <Text style={styles.closeButton}>×</Text>
         </TouchableOpacity>)}
     </Animated.View>);
-    const content = (<Animated.View style={[openStyle, dragStyle]} {...handlers.current}>
+    const content = (<Animated.View style={[openStyle, dragStyle, animatedTransformStyle.current]} {...handlers.current}>
       {children}
     </Animated.View>);
     return (<Modal visible={isOpen} transparent={true} onRequestClose={close} {...modalProps}>

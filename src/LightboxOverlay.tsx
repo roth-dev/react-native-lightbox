@@ -14,6 +14,7 @@ import {
 } from "react-native";
 
 import { LightboxProps, IOrigin, ISpringConfig } from "./Lightbox";
+import { useDoubleTap, AnimatedTransformStyle } from "./use-double-tap";
 import { useNextTick } from "./use-next-tick";
 
 type OmitedLightboxProps = Omit<
@@ -88,6 +89,9 @@ const LightboxOverlay: React.FC<LightboxOverlayProps> = ({
   const pan = useRef(new Animated.Value(0));
   const openVal = useRef(new Animated.Value(0));
   const handlers = useRef<GestureResponderHandlers>();
+  const animatedTransformStyle = useRef<AnimatedTransformStyle>();
+
+  const handleDoubleTap = useDoubleTap({ useNativeDriver });
 
   const [{ isAnimating, isPanning, target }, setState] = useState({
     isAnimating: false,
@@ -112,10 +116,12 @@ const LightboxOverlay: React.FC<LightboxOverlayProps> = ({
       toValue: 0,
       ...springConfig,
       useNativeDriver,
-    }).start(() => {
-      setState((s) => ({ ...s, isAnimating: false }));
+    }).start(({ finished }) => {
+      if (finished) {
+        setState((s) => ({ ...s, isAnimating: false }));
+        handleCloseNextTick();
+      }
     });
-    handleCloseNextTick();
   };
 
   const open = () => {
@@ -135,9 +141,11 @@ const LightboxOverlay: React.FC<LightboxOverlayProps> = ({
       toValue: 1,
       ...springConfig,
       useNativeDriver,
-    }).start(() => {
-      setState((s) => ({ ...s, isAnimating: false }));
-      didOpen!();
+    }).start(({ finished }) => {
+      if (finished) {
+        setState((s) => ({ ...s, isAnimating: false }));
+        didOpen!();
+      }
     });
   };
 
@@ -149,9 +157,12 @@ const LightboxOverlay: React.FC<LightboxOverlayProps> = ({
       onMoveShouldSetPanResponder: () => !isAnimating,
       onMoveShouldSetPanResponderCapture: () => !isAnimating,
 
-      onPanResponderGrant: () => {
+      onPanResponderGrant: (e, gestureState) => {
         pan.current.setValue(0);
         setState((s) => ({ ...s, isPanning: true }));
+
+        // handle double tap
+        handleDoubleTap(e, gestureState, animatedTransformStyle);
       },
 
       onPanResponderMove: Animated.event([null, { dy: pan.current }], {
@@ -175,8 +186,8 @@ const LightboxOverlay: React.FC<LightboxOverlayProps> = ({
             toValue: 0,
             ...springConfig,
             useNativeDriver,
-          }).start(() => {
-            setState((s) => ({ ...s, isPanning: false }));
+          }).start(({ finished }) => {
+            finished && setState((s) => ({ ...s, isPanning: false }));
           });
         }
       },
@@ -256,7 +267,10 @@ const LightboxOverlay: React.FC<LightboxOverlayProps> = ({
   );
 
   const content = (
-    <Animated.View style={[openStyle, dragStyle]} {...handlers.current}>
+    <Animated.View
+      style={[openStyle, dragStyle, animatedTransformStyle.current]}
+      {...handlers.current}
+    >
       {children}
     </Animated.View>
   );
