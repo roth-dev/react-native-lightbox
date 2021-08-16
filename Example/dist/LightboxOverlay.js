@@ -48,7 +48,7 @@ const LightboxOverlay = ({ useNativeDriver, dragDismissThreshold, springConfig, 
     const openVal = useRef(new Animated.Value(0));
     const handlers = useRef();
     const animatedTransformStyle = useRef();
-    const handleDoubleTap = useDoubleTap({
+    const [handleDoubleTap, doubleTapReset] = useDoubleTap({
         useNativeDriver,
         doubleTapEnabled,
         doubleTapGapTimer,
@@ -70,8 +70,7 @@ const LightboxOverlay = ({ useNativeDriver, dragDismissThreshold, springConfig, 
         if (isIOS) {
             StatusBar.setHidden(false, "fade");
         }
-        // reset
-        animatedTransformStyle.current = void 0;
+        doubleTapReset(animatedTransformStyle);
         setState((s) => ({
             ...s,
             isAnimating: true,

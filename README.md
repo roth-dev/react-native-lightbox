@@ -70,6 +70,12 @@ const MyApp = () => (
 |**`didOpen`**|`function`|Triggered after lightbox is opened|
 |**`onLongPress`**|`function`|Triggered after lightbox is long pressed|
 |**`onLayout`**|`function`|Triggered after lightbox layout complete|
+|**`doubleTapCallback`**|`function`|Triggered after double taped|
+|**`doubleTapEnabled`**|`boolean`|Enable double-tap to zoom , defaults to true|
+|**`doubleTapGapTimer`**|`number`|Determine the time interval of double-tap, defaults 300|
+|**`doubleTapZoomToCenter`**|`boolean`|Zoom to center when double-tap trigger|
+|**`doubleTapMaxZoom`**|`number`|Maximum magnification factor, defaults to 2|
+|**`doubleTapZoomStep`**|`number`|The zoom ratio of each double-tap, defaults to 0.5|
 |**`underlayColor`**|`string`|Color of touchable background, defaults to `black`|
 |**`backgroundColor`**|`string`|Color of lightbox background, defaults to `black`|
 |**`swipeToDismiss`**|`bool`|Enables gestures to dismiss the fullscreen mode by swiping up or down, defaults to `true`.|

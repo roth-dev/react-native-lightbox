@@ -23,6 +23,30 @@ export const useDoubleTap = ({ doubleTapGapTimer = 300, doubleTapAnimationDurati
         }
         scale.current = nextScaleStep;
     };
+    const setAnimation = (ref) => {
+        if (!ref)
+            return;
+        ref.current = {
+            transform: [
+                {
+                    scale: animatedScale.current
+                },
+                {
+                    translateX: animatedPositionX.current,
+                },
+                {
+                    translateY: animatedPositionY.current,
+                }
+            ]
+        };
+    };
+    // todo how to reset can be better?
+    const reset = (ref) => {
+        animatedScale.current.setValue(doubleTapInitialScale);
+        animatedPositionX.current.setValue(INIT_POSITION.x);
+        animatedPositionY.current.setValue(INIT_POSITION.y);
+        setAnimation(ref);
+    };
     const handleDoubleTap = (e, gestureState, ref) => {
         if (doubleTapCallback)
             doubleTapCallback(e, gestureState);
@@ -52,23 +76,9 @@ export const useDoubleTap = ({ doubleTapGapTimer = 300, doubleTapAnimationDurati
             }),
         ]).start();
         // todo it's not better enough.
-        if (ref) {
-            ref.current = {
-                transform: [
-                    {
-                        scale: animatedScale.current
-                    },
-                    {
-                        translateX: animatedPositionX.current,
-                    },
-                    {
-                        translateY: animatedPositionY.current,
-                    }
-                ]
-            };
-        }
+        setAnimation(ref);
     };
-    return (e, gestureState, ref) => {
+    const onDoubleTap = (e, gestureState, ref) => {
         const nowTapTimer = now();
         if (lastTapTimer.current && (nowTapTimer - lastTapTimer.current) < doubleTapGapTimer) {
             lastTapTimer.current = 0;
@@ -82,4 +92,8 @@ export const useDoubleTap = ({ doubleTapGapTimer = 300, doubleTapAnimationDurati
             lastTapTimer.current = nowTapTimer;
         }
     };
+    return [
+        onDoubleTap,
+        reset
+    ];
 };

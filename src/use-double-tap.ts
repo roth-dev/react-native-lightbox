@@ -101,7 +101,10 @@ export const useDoubleTap = ({
     }
 
     if (doubleTapZoomToCenter) {
-      coordinates.current = INIT_POSITION;
+      coordinates.current = {
+        x: UNSAFE_INNER_WIDTH__cropWidth / 2,
+        y: UNSAFE_INNER_WIDTH__cropHeight / 2
+      };
     }
 
     Animated.parallel([

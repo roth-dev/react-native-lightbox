@@ -31,7 +31,7 @@ export default () => (
     <SafeAreaView>
       <ScrollView style={styles.container}>
         <View style={styles.text}><Text>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. </Text></View>
-        <Lightbox underlayColor="white">
+        <Lightbox underlayColor="white" doubleTapZoomToCenter={true}>
           <Image
             style={styles.contain}
             resizeMode="contain"

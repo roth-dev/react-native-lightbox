@@ -1,5 +1,4 @@
-/// <reference types="react" />
-import { GestureResponderEvent, PanResponderGestureState, Animated } from 'react-native';
+import { Animated } from 'react-native';
 interface IDoubleTapOptions {
     doubleTapEnabled?: boolean;
     doubleTapGapTimer?: number;
@@ -17,5 +16,5 @@ export interface AnimatedTransformStyle {
     transform: Partial<Record<'scale' | 'translateX' | 'translateY', Animated.Value>>[];
 }
 export declare type DoubleTapOptions = Omit<IDoubleTapOptions, 'UNSAFE_INNER_WIDTH__cropWidth' | 'UNSAFE_INNER_WIDTH__cropHeight'>;
-export declare const useDoubleTap: ({ doubleTapGapTimer, doubleTapAnimationDuration, doubleTapEnabled, doubleTapCallback, doubleTapZoomToCenter, doubleTapMaxZoom, doubleTapInitialScale, doubleTapZoomStep, UNSAFE_INNER_WIDTH__cropWidth, UNSAFE_INNER_WIDTH__cropHeight, useNativeDriver }?: IDoubleTapOptions) => (e: GestureResponderEvent, gestureState: PanResponderGestureState, ref: import("react").MutableRefObject<AnimatedTransformStyle | undefined>) => void;
+export declare const useDoubleTap: ({ doubleTapGapTimer, doubleTapAnimationDuration, doubleTapEnabled, doubleTapCallback, doubleTapZoomToCenter, doubleTapMaxZoom, doubleTapInitialScale, doubleTapZoomStep, UNSAFE_INNER_WIDTH__cropWidth, UNSAFE_INNER_WIDTH__cropHeight, useNativeDriver }?: IDoubleTapOptions) => [Function, Function];
 export {};

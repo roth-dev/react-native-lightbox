@@ -5,4 +5,4 @@ Introduced some destructive updates, but still as far as possible forward compat
 - implement the example via `react-native-starter`.
 - use `ts` rewrite the code.
 - no longer associated with `navigator`.
-- add new properties: `modalProps`, `disabled`, `dragDismissThreshold`, `useNativeDriver`
+- support double-tap zoom.
