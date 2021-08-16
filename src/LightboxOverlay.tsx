@@ -99,7 +99,7 @@ const LightboxOverlay: React.FC<LightboxOverlayProps> = ({
   const handlers = useRef<GestureResponderHandlers>();
   const animatedTransformStyle = useRef<AnimatedTransformStyle>();
 
-  const handleDoubleTap = useDoubleTap({
+  const [ handleDoubleTap, doubleTapReset ] = useDoubleTap({
     useNativeDriver,
     doubleTapEnabled,
     doubleTapGapTimer,
@@ -124,6 +124,8 @@ const LightboxOverlay: React.FC<LightboxOverlayProps> = ({
     if (isIOS) {
       StatusBar.setHidden(false, "fade");
     }
+
+    doubleTapReset(animatedTransformStyle);
 
     setState((s) => ({
       ...s,

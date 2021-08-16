@@ -22,6 +22,7 @@ interface IDoubleTapOptions {
 export interface AnimatedTransformStyle {
   transform: Partial<Record<'scale' | 'translateX' | 'translateY', Animated.Value>>[];
 }
+type AnimatedTransformStyleRef = React.MutableRefObject<AnimatedTransformStyle | undefined>
 
 export type DoubleTapOptions = Omit<IDoubleTapOptions, 'UNSAFE_INNER_WIDTH__cropWidth' | 'UNSAFE_INNER_WIDTH__cropHeight'>;
 
@@ -37,7 +38,7 @@ export const useDoubleTap = ({
   UNSAFE_INNER_WIDTH__cropWidth = width,
   UNSAFE_INNER_WIDTH__cropHeight = height,
   useNativeDriver
-}: IDoubleTapOptions = {}) => {
+}: IDoubleTapOptions = {}): [Function, Function] => {
   const lastTapTimer = useRef<number>(0);
   const coordinates = useRef<{ x: number; y: number }>(INIT_POSITION);
   const scale = useRef<number>(doubleTapInitialScale);
@@ -64,14 +65,32 @@ export const useDoubleTap = ({
     scale.current = nextScaleStep;
   };
 
-  // todo how to reset?
-  const reset = () => {
+  const setAnimation = (ref: AnimatedTransformStyleRef) => {
+    if (!ref) return;
+    ref.current = {
+      transform: [
+        {
+          scale: animatedScale.current
+        },
+        {
+          translateX: animatedPositionX.current,
+        },
+        {
+          translateY: animatedPositionY.current,
+        }
+      ]
+    }
+  }
+
+  // todo how to reset can be better?
+  const reset = (ref: AnimatedTransformStyleRef) => {
     animatedScale.current.setValue(doubleTapInitialScale);
     animatedPositionX.current.setValue(INIT_POSITION.x);
     animatedPositionY.current.setValue(INIT_POSITION.y);
+    setAnimation(ref);
   }
 
-  const handleDoubleTap = (e: GestureResponderEvent, gestureState: PanResponderGestureState, ref: React.MutableRefObject<AnimatedTransformStyle | undefined>) => {
+  const handleDoubleTap = (e: GestureResponderEvent, gestureState: PanResponderGestureState, ref: AnimatedTransformStyleRef) => {
     if (doubleTapCallback) doubleTapCallback(e, gestureState);
 
     handleNextScaleStep();
@@ -104,24 +123,10 @@ export const useDoubleTap = ({
     ]).start();
 
     // todo it's not better enough.
-    if (ref) {
-      ref.current = {
-        transform: [
-          {
-            scale: animatedScale.current
-          },
-          {
-            translateX: animatedPositionX.current,
-          },
-          {
-            translateY: animatedPositionY.current,
-          }
-        ]
-      }
-    }
+    setAnimation(ref);
   }
 
-  return (e: GestureResponderEvent, gestureState: PanResponderGestureState, ref: React.MutableRefObject<AnimatedTransformStyle | undefined>) => {
+  const onDoubleTap = (e: GestureResponderEvent, gestureState: PanResponderGestureState, ref: AnimatedTransformStyleRef) => {
     const nowTapTimer = now();
     if (lastTapTimer.current && (nowTapTimer - lastTapTimer.current) < doubleTapGapTimer) {
       lastTapTimer.current = 0;
@@ -134,4 +139,9 @@ export const useDoubleTap = ({
       lastTapTimer.current = nowTapTimer;
     }
   }
+
+  return [
+    onDoubleTap,
+    reset
+  ]
 }
