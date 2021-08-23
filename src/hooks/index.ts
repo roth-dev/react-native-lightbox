@@ -1,2 +1,2 @@
-export * from './use-double-tap'
+export * from './use-gesture'
 export * from './use-next-tick'

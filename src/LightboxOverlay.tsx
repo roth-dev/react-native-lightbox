@@ -14,14 +14,14 @@ import {
 } from "react-native";
 
 import { LightboxProps, IOrigin, ISpringConfig } from "./Lightbox";
-import { useDoubleTap, AnimatedTransformStyle, DoubleTapOptions, useNextTick } from "./hooks";
+import { useGesture, IGestureProps, useNextTick } from "./hooks";
 
 type OmitedLightboxProps = Omit<
   LightboxProps,
   "style" | "disabled" | "underlayColor" | "activeProps" | "renderContent"
 >;
 
-export interface LightboxOverlayProps extends OmitedLightboxProps, DoubleTapOptions {
+export interface LightboxOverlayProps extends OmitedLightboxProps, IGestureProps {
   isOpen?: boolean;
   origin?: IOrigin;
   springConfig?: ISpringConfig;
@@ -83,7 +83,7 @@ const LightboxOverlay: React.FC<LightboxOverlayProps> = ({
   renderHeader,
   modalProps,
   children,
-  doubleTapEnabled,
+  doubleTapZoomEnabled,
   doubleTapGapTimer,
   doubleTapCallback,
   doubleTapZoomToCenter,
@@ -96,11 +96,10 @@ const LightboxOverlay: React.FC<LightboxOverlayProps> = ({
   const pan = useRef(new Animated.Value(0));
   const openVal = useRef(new Animated.Value(0));
   const handlers = useRef<GestureResponderHandlers>();
-  const animatedTransformStyle = useRef<AnimatedTransformStyle>();
 
-  const [ handleDoubleTap, doubleTapReset ] = useDoubleTap({
+  const [ gesture, animations ] = useGesture({
     useNativeDriver,
-    doubleTapEnabled,
+    doubleTapZoomEnabled,
     doubleTapGapTimer,
     doubleTapCallback,
     doubleTapZoomToCenter,
@@ -124,7 +123,7 @@ const LightboxOverlay: React.FC<LightboxOverlayProps> = ({
       StatusBar.setHidden(false, "fade");
     }
 
-    doubleTapReset(animatedTransformStyle);
+    gesture.reset();
 
     setState((s) => ({
       ...s,
@@ -181,7 +180,7 @@ const LightboxOverlay: React.FC<LightboxOverlayProps> = ({
         setState((s) => ({ ...s, isPanning: true }));
 
         // handle double tap
-        handleDoubleTap(e, gestureState, animatedTransformStyle);
+        gesture.onDoubleTap(e, gestureState);
       },
 
       onPanResponderMove: Animated.event([null, { dy: pan.current }], {
@@ -287,7 +286,7 @@ const LightboxOverlay: React.FC<LightboxOverlayProps> = ({
 
   const content = (
     <Animated.View
-      style={[openStyle, dragStyle, animatedTransformStyle.current]}
+      style={[openStyle, dragStyle, animations]}
       {...handlers.current}
     >
       {children}

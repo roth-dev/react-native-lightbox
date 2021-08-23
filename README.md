@@ -71,7 +71,7 @@ const MyApp = () => (
 |**`onLongPress`**|`function`|Triggered after lightbox is long pressed|
 |**`onLayout`**|`function`|Triggered after lightbox layout complete|
 |**`doubleTapCallback`**|`function`|Triggered after double taped|
-|**`doubleTapEnabled`**|`boolean`|Enable double-tap to zoom , defaults to true|
+|**`doubleTapZoomEnabled`**|`boolean`|Enable double-tap to zoom , defaults to true|
 |**`doubleTapGapTimer`**|`number`|Determine the time interval of double-tap, defaults 300|
 |**`doubleTapZoomToCenter`**|`boolean`|Zoom to center when double-tap trigger|
 |**`doubleTapMaxZoom`**|`number`|Maximum magnification factor, defaults to 2|

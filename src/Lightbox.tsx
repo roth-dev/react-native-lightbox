@@ -15,7 +15,7 @@ import {
 } from "react-native";
 
 import LightboxOverlay from "./LightboxOverlay";
-import { useNextTick, DoubleTapOptions } from "./hooks";
+import { useNextTick, IGestureProps } from "./hooks";
 
 const noop = () => {};
 
@@ -30,7 +30,7 @@ export interface ISpringConfig {
   tension: number;
   friction: number;
 }
-export interface LightboxProps<T = any> extends DoubleTapOptions {
+export interface LightboxProps<T = any> extends IGestureProps {
   activeProps?: Record<string, T>;
   renderContent?: Func<T, JSX.Element>;
   renderHeader?: Func<T, JSX.Element>;
