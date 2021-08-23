@@ -15,8 +15,7 @@ import {
 } from "react-native";
 
 import LightboxOverlay from "./LightboxOverlay";
-import { useNextTick } from "./use-next-tick";
-import { DoubleTapOptions } from "./use-double-tap";
+import { useNextTick, DoubleTapOptions } from "./hooks";
 
 const noop = () => {};
 

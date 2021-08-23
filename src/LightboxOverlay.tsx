@@ -14,8 +14,7 @@ import {
 } from "react-native";
 
 import { LightboxProps, IOrigin, ISpringConfig } from "./Lightbox";
-import { useDoubleTap, AnimatedTransformStyle, DoubleTapOptions } from "./use-double-tap";
-import { useNextTick } from "./use-next-tick";
+import { useDoubleTap, AnimatedTransformStyle, DoubleTapOptions, useNextTick } from "./hooks";
 
 type OmitedLightboxProps = Omit<
   LightboxProps,

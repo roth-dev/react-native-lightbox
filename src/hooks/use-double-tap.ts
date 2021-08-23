@@ -38,7 +38,7 @@ export const useDoubleTap = ({
   UNSAFE_INNER_WIDTH__cropWidth = width,
   UNSAFE_INNER_WIDTH__cropHeight = height,
   useNativeDriver
-}: IDoubleTapOptions = {}): [Function, Function] => {
+}: IDoubleTapOptions = {}): [Function, Function, boolean] => {
   const lastTapTimer = useRef<number>(0);
   const coordinates = useRef<{ x: number; y: number }>(INIT_POSITION);
   const scale = useRef<number>(doubleTapInitialScale);
@@ -145,6 +145,7 @@ export const useDoubleTap = ({
 
   return [
     onDoubleTap,
-    reset
+    reset,
+    doubleTaped.current
   ]
 }
