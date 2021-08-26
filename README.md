@@ -30,6 +30,23 @@ const LightboxView = ({ navigator }) => (
 );
 ```
 
+### can long press to save image?
+
+`longPressCallback` can resolve it!
+
+```js
+const uri = 'http://knittingisawesome.com/wp-content/uploads/2012/12/cat-wearing-a-reindeer-hat1.jpg'
+const longPress = (uri) => {
+  CameraRoll.saveToCameraRoll(uri)
+}
+<Lightbox longPressCallback={() => longPress(uri)}>
+    <Image
+      style={{ height: 300 }}
+      source={{ uri }}
+    />
+  </Lightbox>
+```
+
 ### Navigator setup/Android support
 
 > Note: react-native-lightbox-v2 will no longer support navigator after version 0.8.9.
@@ -72,7 +89,9 @@ const MyApp = () => (
 |**`onLayout`**|`function`|Triggered after lightbox layout complete|
 |**`doubleTapCallback`**|`function`|Triggered after double taped|
 |**`doubleTapZoomEnabled`**|`boolean`|Enable double-tap to zoom , defaults to true|
-|**`doubleTapGapTimer`**|`number`|Determine the time interval of double-tap, defaults 300|
+|**`doubleTapGapTimer`**|`number`|Determine the time interval of double-tap, defaults 500ms|
+|**`longPressGapTimer`**|`number`|Determine the time interval of long-press, defaults 2000ms|
+|**`longPressCallback`**|`function`|Triggered after the content is long pressed|
 |**`doubleTapZoomToCenter`**|`boolean`|Zoom to center when double-tap trigger|
 |**`doubleTapMaxZoom`**|`number`|Maximum magnification factor, defaults to 2|
 |**`doubleTapZoomStep`**|`number`|The zoom ratio of each double-tap, defaults to 0.5|

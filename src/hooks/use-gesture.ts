@@ -26,20 +26,32 @@ interface IDoubleTapOptions {
   UNSAFE_INNER_WIDTH__cropHeight?: number;
 }
 
+// -------------------------  long press props  -------------------------
+interface ILongPressProps {
+  longPressGapTimer?: number;
+  longPressCallback?: Function;
+  // longPressToSaveEnable?: boolean;
+}
+
 export interface AnimatedTransformStyle {
   transform: Partial<Record<"scale" | "translateX" | "translateY", Animated.Value>>[];
 }
 
 // -------------------------  all the gesture ability props  -------------------------
-export interface IGestureProps extends IDoubleTapOptions { }
+export interface IGestureProps extends IDoubleTapOptions, ILongPressProps { }
 export interface GestureReturnFunction {
   reset: Function;
   onDoubleTap: Function;
+  init: Function;
+  release: Function;
+  onLongPress: Function;
+  isDoubleTaped: boolean;
+  isLongPressed: boolean;
 }
 
 // -------------------------  hooks  -------------------------
 export const useGesture = ({
-  doubleTapGapTimer = 300,
+  doubleTapGapTimer = 500,
   doubleTapAnimationDuration = 100,
   doubleTapZoomEnabled = true,
   doubleTapCallback,
@@ -49,19 +61,26 @@ export const useGesture = ({
   doubleTapZoomStep = 0.5,
   UNSAFE_INNER_WIDTH__cropWidth = width,
   UNSAFE_INNER_WIDTH__cropHeight = height,
+  longPressGapTimer = 2000,
+  longPressCallback,
+  // longPressToSaveEnable = false,
   useNativeDriver,
 }: IGestureProps): [GestureReturnFunction, AnimatedTransformStyle | undefined] => {
   // last tap timer
   const lastTapTimer = useRef<number>(0);
+  // long press timer
+  const longPressTimer = useRef<number | null>();
   // if double taped
   const isDoubleTaped = useRef<boolean>(false);
+  // if long pressed
+  const isLongPressed = useRef<boolean>(false);
   // double tap coordinates
   const coordinates = useRef<{ x: number; y: number }>(INIT_POSITION);
   // double tap scale
   const doubleTapScale = useRef<number>(doubleTapInitialScale);
   // animated
   const animatedScale = useRef<Animated.Value>(
-    new Animated.Value(doubleTapInitialScale)
+    new Animated.Value(1)
   );
   const animatedPositionX = useRef<Animated.Value>(
     new Animated.Value(INIT_POSITION.x)
@@ -72,96 +91,107 @@ export const useGesture = ({
   // animation style to export
   const animations = useRef<AnimatedTransformStyle>();
 
-  // handle double-tap
-  const onDoubleTap = (
-    e: GestureResponderEvent,
-    gestureState: PanResponderGestureState
-  ) => {
+  // init the status
+  const init = () => {
+    isDoubleTaped.current = false;
+    isLongPressed.current = false;
+  }
+
+  const release = () => {
+    if (longPressTimer.current) clearTimeout(longPressTimer.current);
+  }
+
+  const onDoubleTap = (e: GestureResponderEvent, gestureState: PanResponderGestureState) => {
+    if (gestureState.numberActiveTouches > 1) return;
     const nowTapTimer = now();
-    if (gestureState.numberActiveTouches <= 1) {
-      // double tap
-      if (
-        lastTapTimer.current &&
-        (nowTapTimer - lastTapTimer.current) < doubleTapGapTimer
-      ) {
-        isDoubleTaped.current = true;
-        lastTapTimer.current = 0;
+    // double tap
+    if ((nowTapTimer - lastTapTimer.current) < doubleTapGapTimer) {
+      isDoubleTaped.current = true;
+      lastTapTimer.current = 0;
 
-        // double tap callback
-        if (doubleTapCallback) doubleTapCallback(e, gestureState);
+      // double tap callback
+      if (doubleTapCallback) doubleTapCallback(e, gestureState);
 
-        // double tap zoom
-        if (!doubleTapZoomEnabled) return;
+      // double tap zoom
+      if (!doubleTapZoomEnabled) return;
 
-        // next scale
-        if (doubleTapScale.current >= doubleTapMaxZoom) {
-          coordinates.current = INIT_POSITION;
-          return (doubleTapScale.current = doubleTapInitialScale);
-        }
+      // cancel long press
+      longPressTimer.current && clearTimeout(longPressTimer.current);
 
-        let nextScaleStep =
-          doubleTapScale.current + doubleTapScale.current * doubleTapZoomStep;
+      // next scale
+      doubleTapScale.current = doubleTapScale.current + doubleTapInitialScale * doubleTapZoomStep;
 
-        if (nextScaleStep >= doubleTapMaxZoom) {
-          nextScaleStep = doubleTapMaxZoom;
-        }
-
-        doubleTapScale.current = nextScaleStep;
-
-        coordinates.current = {
-          x: e.nativeEvent.changedTouches[0].pageX,
-          y: e.nativeEvent.changedTouches[0].pageY,
-        };
-
-        if (doubleTapZoomToCenter) {
-          coordinates.current = {
-            x: UNSAFE_INNER_WIDTH__cropWidth / 2,
-            y: UNSAFE_INNER_WIDTH__cropHeight / 2,
-          };
-        }
-
-        Animated.parallel([
-          Animated.timing(animatedScale.current, {
-            toValue: doubleTapScale.current,
-            duration: doubleTapAnimationDuration,
-            useNativeDriver,
-          }),
-          Animated.timing(animatedPositionX.current, {
-            toValue:
-              ((UNSAFE_INNER_WIDTH__cropWidth / 2 - coordinates.current.x) *
-                (doubleTapScale.current - doubleTapInitialScale)) /
-              doubleTapScale.current,
-            duration: doubleTapAnimationDuration,
-            useNativeDriver,
-          }),
-          Animated.timing(animatedPositionY.current, {
-            toValue:
-              ((UNSAFE_INNER_WIDTH__cropHeight / 2 - coordinates.current.y) *
-                (doubleTapScale.current - doubleTapInitialScale)) /
-              doubleTapScale.current,
-            duration: doubleTapAnimationDuration,
-            useNativeDriver,
-          }),
-        ]).start();
-
-        animations.current = {
-          transform: [
-            {
-              scale: animatedScale.current,
-            },
-            {
-              translateX: animatedPositionX.current,
-            },
-            {
-              translateY: animatedPositionY.current,
-            },
-          ],
-        };
-      } else {
-        lastTapTimer.current = nowTapTimer;
+      if (doubleTapScale.current > doubleTapMaxZoom) {
+        doubleTapScale.current = doubleTapInitialScale;
       }
+
+      coordinates.current = {
+        x: e.nativeEvent.changedTouches[0].pageX,
+        y: e.nativeEvent.changedTouches[0].pageY,
+      };
+
+      if (doubleTapZoomToCenter) {
+        coordinates.current = {
+          x: UNSAFE_INNER_WIDTH__cropWidth / 2,
+          y: UNSAFE_INNER_WIDTH__cropHeight / 2,
+        };
+      }
+
+      Animated.parallel([
+        Animated.timing(animatedScale.current, {
+          toValue: doubleTapScale.current,
+          duration: doubleTapAnimationDuration,
+          useNativeDriver,
+        }),
+        Animated.timing(animatedPositionX.current, {
+          toValue:
+            ((UNSAFE_INNER_WIDTH__cropWidth / 2 - coordinates.current.x) *
+              (doubleTapScale.current - doubleTapInitialScale)) /
+            doubleTapScale.current,
+          duration: doubleTapAnimationDuration,
+          useNativeDriver,
+        }),
+        Animated.timing(animatedPositionY.current, {
+          toValue:
+            ((UNSAFE_INNER_WIDTH__cropHeight / 2 - coordinates.current.y) *
+              (doubleTapScale.current - doubleTapInitialScale)) /
+            doubleTapScale.current,
+          duration: doubleTapAnimationDuration,
+          useNativeDriver,
+        }),
+      ]).start();
+
+      animations.current = {
+        transform: [
+          {
+            scale: animatedScale.current,
+          },
+          {
+            translateX: animatedPositionX.current,
+          },
+          {
+            translateY: animatedPositionY.current,
+          },
+        ],
+      };
+    } else {
+      lastTapTimer.current = nowTapTimer;
     }
   };
+
+  const onLongPress = (e: GestureResponderEvent, gestureState: PanResponderGestureState) => {
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current);
+      longPressTimer.current = null;
+    }
+
+    longPressTimer.current = setTimeout(() => {
+      isLongPressed.current = true;
+      if (longPressCallback) {
+        longPressCallback(e, gestureState)
+      }
+    }, longPressGapTimer)
+  }
 
   // reset
   const reset = () => {
@@ -169,9 +199,8 @@ export const useGesture = ({
     animatedScale.current.setValue(doubleTapInitialScale);
     animatedPositionX.current.setValue(INIT_POSITION.x);
     animatedPositionY.current.setValue(INIT_POSITION.y);
+    animations.current = void 0;
   };
-
-  // todo handle long press and press to save image
 
   // todo pinch to zoom
 
@@ -179,6 +208,11 @@ export const useGesture = ({
     {
       onDoubleTap,
       reset,
+      init,
+      release,
+      onLongPress,
+      isDoubleTaped: isDoubleTaped.current,
+      isLongPressed: isLongPressed.current
     },
     animations.current,
   ];

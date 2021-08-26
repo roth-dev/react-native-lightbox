@@ -6,3 +6,4 @@ Introduced some destructive updates, but still as far as possible forward compat
 - use `ts` rewrite the code.
 - no longer associated with `navigator`.
 - support double-tap zoom.
+- support long-press.

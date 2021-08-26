@@ -52,7 +52,7 @@ useNativeDriver, }) => {
             // cancel long press
             longPressTimer.current && clearTimeout(longPressTimer.current);
             // next scale
-            doubleTapScale.current = doubleTapScale.current + doubleTapScale.current * doubleTapZoomStep;
+            doubleTapScale.current = doubleTapScale.current + doubleTapInitialScale * doubleTapZoomStep;
             if (doubleTapScale.current > doubleTapMaxZoom) {
                 doubleTapScale.current = doubleTapInitialScale;
             }
@@ -123,6 +123,7 @@ useNativeDriver, }) => {
         animatedScale.current.setValue(doubleTapInitialScale);
         animatedPositionX.current.setValue(INIT_POSITION.x);
         animatedPositionY.current.setValue(INIT_POSITION.y);
+        animations.current = void 0;
     };
     // todo pinch to zoom
     return [

@@ -1,8 +1,8 @@
 import React from "react";
 import { LightboxProps, IOrigin, ISpringConfig } from "./Lightbox";
-import { DoubleTapOptions } from "./use-double-tap";
+import { IGestureProps } from "./hooks";
 declare type OmitedLightboxProps = Omit<LightboxProps, "style" | "disabled" | "underlayColor" | "activeProps" | "renderContent">;
-export interface LightboxOverlayProps extends OmitedLightboxProps, DoubleTapOptions {
+export interface LightboxOverlayProps extends OmitedLightboxProps, IGestureProps {
     isOpen?: boolean;
     origin?: IOrigin;
     springConfig?: ISpringConfig;

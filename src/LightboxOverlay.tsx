@@ -91,6 +91,8 @@ const LightboxOverlay: React.FC<LightboxOverlayProps> = ({
   doubleTapZoomStep,
   doubleTapInitialScale,
   doubleTapAnimationDuration,
+  longPressGapTimer,
+  longPressCallback
 }) => {
   const _panResponder = useRef<PanResponderInstance>();
   const pan = useRef(new Animated.Value(0));
@@ -107,6 +109,8 @@ const LightboxOverlay: React.FC<LightboxOverlayProps> = ({
     doubleTapZoomStep,
     doubleTapInitialScale,
     doubleTapAnimationDuration,
+    longPressGapTimer,
+    longPressCallback
   });
 
   const [{ isAnimating, isPanning, target }, setState] = useState({
@@ -176,10 +180,12 @@ const LightboxOverlay: React.FC<LightboxOverlayProps> = ({
       onMoveShouldSetPanResponderCapture: () => !isAnimating,
 
       onPanResponderGrant: (e, gestureState) => {
+        gesture.init();
+
         pan.current.setValue(0);
         setState((s) => ({ ...s, isPanning: true }));
 
-        // handle double tap
+        gesture.onLongPress(e, gestureState);
         gesture.onDoubleTap(e, gestureState);
       },
 
@@ -188,6 +194,9 @@ const LightboxOverlay: React.FC<LightboxOverlayProps> = ({
       }),
       onPanResponderTerminationRequest: () => true,
       onPanResponderRelease: (evt, gestureState) => {
+        gesture.release();
+        if (gesture.isDoubleTaped) return;
+        if (gesture.isLongPressed) return;
         if (Math.abs(gestureState.dy) > dragDismissThreshold!) {
           setState((s) => ({
             ...s,

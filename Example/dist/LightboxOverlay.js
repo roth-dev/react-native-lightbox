@@ -1,7 +1,6 @@
 import React, { useRef, useEffect, useState } from "react";
 import { Animated, Dimensions, PanResponder, Platform, StyleSheet, StatusBar, TouchableOpacity, Text, Modal, } from "react-native";
-import { useDoubleTap } from "./use-double-tap";
-import { useNextTick } from "./use-next-tick";
+import { useGesture, useNextTick } from "./hooks";
 const { width: WINDOW_WIDTH, height: WINDOW_HEIGHT } = Dimensions.get("window");
 const isIOS = Platform.OS === "ios";
 const getDefaultTarget = () => ({ x: 0, y: 0, opacity: 1 });
@@ -42,15 +41,14 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.8,
     },
 });
-const LightboxOverlay = ({ useNativeDriver, dragDismissThreshold, springConfig, isOpen, onClose, willClose, didOpen, swipeToDismiss, origin, backgroundColor, renderHeader, modalProps, children, doubleTapEnabled, doubleTapGapTimer, doubleTapCallback, doubleTapZoomToCenter, doubleTapMaxZoom, doubleTapZoomStep, doubleTapInitialScale, doubleTapAnimationDuration, }) => {
+const LightboxOverlay = ({ useNativeDriver, dragDismissThreshold, springConfig, isOpen, onClose, willClose, didOpen, swipeToDismiss, origin, backgroundColor, renderHeader, modalProps, children, doubleTapZoomEnabled, doubleTapGapTimer, doubleTapCallback, doubleTapZoomToCenter, doubleTapMaxZoom, doubleTapZoomStep, doubleTapInitialScale, doubleTapAnimationDuration, longPressGapTimer, longPressCallback }) => {
     const _panResponder = useRef();
     const pan = useRef(new Animated.Value(0));
     const openVal = useRef(new Animated.Value(0));
     const handlers = useRef();
-    const animatedTransformStyle = useRef();
-    const [handleDoubleTap, doubleTapReset] = useDoubleTap({
+    const [gesture, animations] = useGesture({
         useNativeDriver,
-        doubleTapEnabled,
+        doubleTapZoomEnabled,
         doubleTapGapTimer,
         doubleTapCallback,
         doubleTapZoomToCenter,
@@ -58,6 +56,8 @@ const LightboxOverlay = ({ useNativeDriver, dragDismissThreshold, springConfig, 
         doubleTapZoomStep,
         doubleTapInitialScale,
         doubleTapAnimationDuration,
+        longPressGapTimer,
+        longPressCallback
     });
     const [{ isAnimating, isPanning, target }, setState] = useState({
         isAnimating: false,
@@ -70,7 +70,7 @@ const LightboxOverlay = ({ useNativeDriver, dragDismissThreshold, springConfig, 
         if (isIOS) {
             StatusBar.setHidden(false, "fade");
         }
-        doubleTapReset(animatedTransformStyle);
+        gesture.reset();
         setState((s) => ({
             ...s,
             isAnimating: true,
@@ -115,16 +115,22 @@ const LightboxOverlay = ({ useNativeDriver, dragDismissThreshold, springConfig, 
             onMoveShouldSetPanResponder: () => !isAnimating,
             onMoveShouldSetPanResponderCapture: () => !isAnimating,
             onPanResponderGrant: (e, gestureState) => {
+                gesture.init();
                 pan.current.setValue(0);
                 setState((s) => ({ ...s, isPanning: true }));
-                // handle double tap
-                handleDoubleTap(e, gestureState, animatedTransformStyle);
+                gesture.onLongPress(e, gestureState);
+                gesture.onDoubleTap(e, gestureState);
             },
             onPanResponderMove: Animated.event([null, { dy: pan.current }], {
                 useNativeDriver,
             }),
             onPanResponderTerminationRequest: () => true,
             onPanResponderRelease: (evt, gestureState) => {
+                gesture.release();
+                if (gesture.isDoubleTaped)
+                    return;
+                if (gesture.isLongPressed)
+                    return;
                 if (Math.abs(gestureState.dy) > dragDismissThreshold) {
                     setState((s) => ({
                         ...s,
@@ -203,7 +209,7 @@ const LightboxOverlay = ({ useNativeDriver, dragDismissThreshold, springConfig, 
           <Text style={styles.closeButton}>×</Text>
         </TouchableOpacity>)}
     </Animated.View>);
-    const content = (<Animated.View style={[openStyle, dragStyle, animatedTransformStyle.current]} {...handlers.current}>
+    const content = (<Animated.View style={[openStyle, dragStyle, animations]} {...handlers.current}>
       {children}
     </Animated.View>);
     return (<Modal visible={isOpen} transparent={true} onRequestClose={close} {...modalProps}>

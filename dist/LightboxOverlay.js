@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.8,
     },
 });
-const LightboxOverlay = ({ useNativeDriver, dragDismissThreshold, springConfig, isOpen, onClose, willClose, didOpen, swipeToDismiss, origin, backgroundColor, renderHeader, modalProps, children, doubleTapZoomEnabled, doubleTapGapTimer, doubleTapCallback, doubleTapZoomToCenter, doubleTapMaxZoom, doubleTapZoomStep, doubleTapInitialScale, doubleTapAnimationDuration, }) => {
+const LightboxOverlay = ({ useNativeDriver, dragDismissThreshold, springConfig, isOpen, onClose, willClose, didOpen, swipeToDismiss, origin, backgroundColor, renderHeader, modalProps, children, doubleTapZoomEnabled, doubleTapGapTimer, doubleTapCallback, doubleTapZoomToCenter, doubleTapMaxZoom, doubleTapZoomStep, doubleTapInitialScale, doubleTapAnimationDuration, longPressGapTimer, longPressCallback }) => {
     const _panResponder = useRef();
     const pan = useRef(new Animated.Value(0));
     const openVal = useRef(new Animated.Value(0));
@@ -56,6 +56,8 @@ const LightboxOverlay = ({ useNativeDriver, dragDismissThreshold, springConfig, 
         doubleTapZoomStep,
         doubleTapInitialScale,
         doubleTapAnimationDuration,
+        longPressGapTimer,
+        longPressCallback
     });
     const [{ isAnimating, isPanning, target }, setState] = useState({
         isAnimating: false,
@@ -113,9 +115,10 @@ const LightboxOverlay = ({ useNativeDriver, dragDismissThreshold, springConfig, 
             onMoveShouldSetPanResponder: () => !isAnimating,
             onMoveShouldSetPanResponderCapture: () => !isAnimating,
             onPanResponderGrant: (e, gestureState) => {
+                gesture.init();
                 pan.current.setValue(0);
                 setState((s) => ({ ...s, isPanning: true }));
-                // handle double tap
+                gesture.onLongPress(e, gestureState);
                 gesture.onDoubleTap(e, gestureState);
             },
             onPanResponderMove: Animated.event([null, { dy: pan.current }], {
@@ -123,6 +126,11 @@ const LightboxOverlay = ({ useNativeDriver, dragDismissThreshold, springConfig, 
             }),
             onPanResponderTerminationRequest: () => true,
             onPanResponderRelease: (evt, gestureState) => {
+                gesture.release();
+                if (gesture.isDoubleTaped)
+                    return;
+                if (gesture.isLongPressed)
+                    return;
                 if (Math.abs(gestureState.dy) > dragDismissThreshold) {
                     setState((s) => ({
                         ...s,

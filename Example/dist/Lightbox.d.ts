@@ -1,6 +1,6 @@
 import React from "react";
 import { StyleProp, ViewStyle, ModalProps } from "react-native";
-import { DoubleTapOptions } from "./use-double-tap";
+import { IGestureProps } from "./hooks";
 export declare type Func<T, R> = (...args: T[]) => R;
 export interface IOrigin {
     width: number;
@@ -12,7 +12,7 @@ export interface ISpringConfig {
     tension: number;
     friction: number;
 }
-export interface LightboxProps<T = any> extends DoubleTapOptions {
+export interface LightboxProps<T = any> extends IGestureProps {
     activeProps?: Record<string, T>;
     renderContent?: Func<T, JSX.Element>;
     renderHeader?: Func<T, JSX.Element>;
