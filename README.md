@@ -1,5 +1,7 @@
 # react-native-lightbox-v2
 
+👀 0.8.9-beta.0 is coming!
+
 > *Fork this project to do some updates, because the original library seems to be out of maintenance！*
 > *Thanks Joel Arvidsson*
 
