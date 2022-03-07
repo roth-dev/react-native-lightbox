@@ -1,6 +1,6 @@
 # react-native-lightbox-v2
 
-👀 0.8.9-beta.0 is coming!
+👀 0.9.0 is coming!
 
 > *Fork this project to do some updates, because the original library seems to be out of maintenance！*
 > *Thanks Joel Arvidsson*
@@ -15,7 +15,7 @@ yarn add react-native-lightbox-v2
 
 ## Usage
 
-> Note: react-native-lightbox-v2 will no longer support navigator after version 0.8.9.
+> Note: react-native-lightbox-v2 will no longer support navigator after version 0.9.0.
 
 `navigator` property is optional but recommended on iOS, see next section for `Navigator` configuration.
 
@@ -51,7 +51,7 @@ const longPress = (uri) => {
 
 ### Navigator setup/Android support
 
-> Note: react-native-lightbox-v2 will no longer support navigator after version 0.8.9.
+> Note: react-native-lightbox-v2 will no longer support navigator after version 0.9.0.
 
 For android support you must pass a reference to a `Navigator` since it does not yet have the `Modal` component and is not on the official todo list. See the `Example` project for a complete example.
 
