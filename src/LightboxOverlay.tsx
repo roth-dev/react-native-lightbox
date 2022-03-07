@@ -11,6 +11,7 @@ import {
   Text,
   Modal,
   GestureResponderHandlers,
+  SafeAreaView,
 } from "react-native";
 
 import { LightboxProps, IOrigin, ISpringConfig } from "./Lightbox";
@@ -21,7 +22,9 @@ type OmitedLightboxProps = Omit<
   "style" | "disabled" | "underlayColor" | "activeProps" | "renderContent"
 >;
 
-export interface LightboxOverlayProps extends OmitedLightboxProps, IGestureProps {
+export interface LightboxOverlayProps
+  extends OmitedLightboxProps,
+    IGestureProps {
   isOpen?: boolean;
   origin?: IOrigin;
   springConfig?: ISpringConfig;
@@ -43,6 +46,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     flex: 1,
     justifyContent: "center",
+    alignItems: "center",
     // Android pan handlers crash without this declaration:
     backgroundColor: "transparent",
   },
@@ -92,14 +96,14 @@ const LightboxOverlay: React.FC<LightboxOverlayProps> = ({
   doubleTapInitialScale,
   doubleTapAnimationDuration,
   longPressGapTimer,
-  longPressCallback
+  longPressCallback,
 }) => {
   const _panResponder = useRef<PanResponderInstance>();
   const pan = useRef(new Animated.Value(0));
   const openVal = useRef(new Animated.Value(0));
   const handlers = useRef<GestureResponderHandlers>();
 
-  const [ gesture, animations ] = useGesture({
+  const [gesture, animations] = useGesture({
     useNativeDriver,
     doubleTapZoomEnabled,
     doubleTapGapTimer,
@@ -110,7 +114,7 @@ const LightboxOverlay: React.FC<LightboxOverlayProps> = ({
     doubleTapInitialScale,
     doubleTapAnimationDuration,
     longPressGapTimer,
-    longPressCallback
+    longPressCallback,
   });
 
   const [{ isAnimating, isPanning, target }, setState] = useState({
@@ -286,9 +290,11 @@ const LightboxOverlay: React.FC<LightboxOverlayProps> = ({
       {renderHeader ? (
         renderHeader(close)
       ) : (
-        <TouchableOpacity onPress={close}>
-          <Text style={styles.closeButton}>×</Text>
-        </TouchableOpacity>
+        <SafeAreaView>
+          <TouchableOpacity onPress={close}>
+            <Text style={styles.closeButton}>×</Text>
+          </TouchableOpacity>
+        </SafeAreaView>
       )}
     </Animated.View>
   );
