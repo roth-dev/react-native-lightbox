@@ -153,7 +153,7 @@ const Lightbox: React.FC<LightboxProps> = ({
           onLongPress={onLongPress}
           disabled={disabled}
         >
-          {children}
+          {children as any}
       </TouchableHighlight>
     );
   }
