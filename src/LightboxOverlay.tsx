@@ -19,7 +19,7 @@ import { useGesture, IGestureProps, useNextTick } from "./hooks";
 
 type OmitedLightboxProps = Omit<
   LightboxProps,
-  "style" | "disabled" | "underlayColor" | "activeProps" | "renderContent"
+  "style" | "disabled" | "underlayColor" | "activeProps" | "renderContent" | "renderItem"
 >;
 
 export interface LightboxOverlayProps
