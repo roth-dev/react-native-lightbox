@@ -39,6 +39,7 @@ export interface LightboxProps<T = any> extends IGestureProps {
   onOpen?: Func<T, void>;
   willClose?: Func<T, void>;
   onClose?: Func<T, void>;
+  onPress?: Func<T, void>;
   onLongPress?: Func<T, void>;
   onLayout?: Func<T, void>;
   swipeToDismiss?: boolean;
@@ -50,6 +51,7 @@ export interface LightboxProps<T = any> extends IGestureProps {
   useNativeDriver?: boolean;
   dragDismissThreshold?: number;
   modalProps?: ModalProps;
+  openOnLongPress?: boolean;
 }
 
 const Lightbox: React.FC<LightboxProps> = ({
@@ -64,6 +66,7 @@ const Lightbox: React.FC<LightboxProps> = ({
   onOpen = noop,
   willClose = noop,
   onClose = noop,
+  onPress = noop,
   onLongPress = noop,
   onLayout = noop,
   springConfig = { tension: 30, friction: 7 },
@@ -73,6 +76,7 @@ const Lightbox: React.FC<LightboxProps> = ({
   dragDismissThreshold = 150,
   children,
   modalProps = {},
+  openOnLongPress = false,
   ...rest
 }) => {
   const layoutOpacity = useRef(new Animated.Value(1));
@@ -149,8 +153,8 @@ const Lightbox: React.FC<LightboxProps> = ({
     return (
       <TouchableHighlight
           underlayColor={underlayColor}
-          onPress={open}
-          onLongPress={onLongPress}
+          onPress={openOnLongPress ? onPress : open}
+          onLongPress={openOnLongPress ? open : onLongPress}
           disabled={disabled}
         >
           {children as any}
